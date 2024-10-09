@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { DropzoneOptions, useDropzone } from "react-dropzone";
 
 interface FileUploderProps {
@@ -49,7 +49,6 @@ const FileUploader: React.FC<FileUploderProps> = ({ onUpload, uploadedFiles,  ma
                 </div>
             )}
         </div>
-
     )
 }
 

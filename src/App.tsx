@@ -2,14 +2,34 @@ import axios from 'axios';
 import './index.css'
 
 import FileUploader from './components/FileUploader'
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import LineChart from './components/LineChart';
+import ClassesReport from './components/ClassesReport';
+interface IClassData {
+  date: string;
+  count: number;
+}
 
 const App = () => {
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [classData, setClassData] = useState<IClassData[]>([]);
 
   const [registrationRes, setRegistrationRes] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchClassDaywiseData = async () => {
+      try {
+        // Day wise scheduled classes data
+        const response = await axios.get('http://localhost:3000/daywise-classes');
+        setClassData(response.data);
+      } catch (error) {
+        console.error('Error fetching class data:', error);
+      }
+    };
+    fetchClassDaywiseData();
+  }, []);
 
   const handleFileUpload = (acceptedFiles: File[]) => {
     setUploadedFiles((prevFiles) => [...prevFiles, ...acceptedFiles])
@@ -45,7 +65,7 @@ const App = () => {
       </div>
       <div>
         <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' onClick={uploadFileToServer}>
-          Upload File to Server 
+          Upload File to Server
         </button>
       </div>
 
@@ -54,7 +74,7 @@ const App = () => {
           <div>Uploading, please wait...</div>
         </div>
       )}
-
+      
       <div>
         {registrationRes.length > 0 && (
           <div className="mt-8 w-full max-w-4xl">
@@ -88,6 +108,11 @@ const App = () => {
         )}
 
       </div>
+
+      <LineChart data={classData} />
+
+      <ClassesReport />
+
     </div>
   )
 }
