@@ -30,7 +30,7 @@ const App = () => {
   const [registrationRes, setRegistrationRes] = useState<IRegistrationRes[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const socket: any = io(`http://localhost:3000`, {
+  const socket: any = io(import.meta.env.VITE_BASE_API_URL, {
     transports: ['websocket'],
     reconnection: false
   });
@@ -55,7 +55,7 @@ const App = () => {
     const fetchClassDaywiseData = async () => {
       try {
         // Day wise scheduled classes data
-        const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}daywise-classes`);
+        const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}/daywise-classes`);
         setClassData(response.data);
       } catch (error) {
         console.error('Error fetching class data:', error);
@@ -84,7 +84,7 @@ const App = () => {
     });
     setLoading(true);
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}registration`, formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}/registration`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
