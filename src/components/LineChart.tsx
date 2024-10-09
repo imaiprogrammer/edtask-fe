@@ -9,7 +9,7 @@ interface LineChartProps {
   }[];
 }
 
-const LineChart: React.FC<LineChartProps> = ({ data }) => {
+const LineChart: React.FC<LineChartProps> = ({ data }: { data: any}) => {
   const chartOptions: ApexOptions = {
     chart: {
       id: 'basic-line',
@@ -17,7 +17,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
       height: 350,
     },
     xaxis: {
-      categories: data.map((entry) => entry.date),
+      categories: data?.map((entry: any) => entry.date),
       title: {
         text: 'Date',
       },
@@ -39,7 +39,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
   const chartSeries = [
     {
       name: 'Classes',
-      data: data.map((entry) => entry.count),
+      data: data?.map((entry: any) => entry.count),
     },
   ];
 

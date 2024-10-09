@@ -22,7 +22,7 @@ const App = () => {
     const fetchClassDaywiseData = async () => {
       try {
         // Day wise scheduled classes data
-        const response = await axios.get('http://localhost:3000/daywise-classes');
+        const response = await axios.get(`${import.meta.env.VITE_BASE_API_URL}daywise-classes`);
         setClassData(response.data);
       } catch (error) {
         console.error('Error fetching class data:', error);
@@ -42,7 +42,7 @@ const App = () => {
     });
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/registration', formData, {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_API_URL}registration`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

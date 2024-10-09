@@ -17,8 +17,8 @@ const ClassesReport: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const instructorsResponse = await axios.get('http://localhost:3000/instructors');
-        const registerationResponse = await axios.get('http://localhost:3000/registrations-list');
+        const instructorsResponse = await axios.get(`${import.meta.env.VITE_BASE_API_URL}instructors`);
+        const registerationResponse = await axios.get(`${import.meta.env.VITE_BASE_API_URL}registrations-list`);
         setRegisteredData(registerationResponse.data);
         setInstructors(instructorsResponse.data);
         setFilteredData(registerationResponse.data);
