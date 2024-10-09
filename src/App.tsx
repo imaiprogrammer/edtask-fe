@@ -29,19 +29,27 @@ const App = () => {
   const [classData, setClassData] = useState<IClassData[]>([]);
   const [registrationRes, setRegistrationRes] = useState<IRegistrationRes[]>([]);
   const [loading, setLoading] = useState(false);
-  const socket: any = io(`http://localhost:3000`);
 
-  useEffect(() => {
-    socket.on('record_upload_status', (data: IRegistrationRes) => {
-      setRegistrationRes((prevRegs: any[]) => [...prevRegs, data]);
-    });
+  const socket: any = io(`http://localhost:3000`, {
+    transports: ['websocket'],
+    reconnection: false
+  });
 
-    return () => {
-      socket.disconnect();
-    };
-  }, [socket]);
+  socket.on('connect', () => {
+    console.log(`Socket connected: ${socket.id}`);
+  });
+  socket.on('disconnect', (reason: any) => {
+    console.log(`Socket disconnected: ${socket.id} - Reason: ${reason}`);
+  });
 
+  socket.on('reconnect', () => {
+    console.log(`Socket reconnected with new ID: ${socket.id}`);
+  });
 
+  socket.on('record_upload_status', (data: any) => {
+    console.log('Record upload status:', data);
+    setRegistrationRes((prevRegs: any[]) => [...prevRegs, data]);
+  });
 
   useEffect(() => {
     const fetchClassDaywiseData = async () => {
@@ -61,6 +69,14 @@ const App = () => {
   }
 
   const uploadFileToServer = async () => {
+    if (!socket.id) {
+      console.error('Socket is not connected');
+      return;
+    }
+    if (uploadedFiles.length === 0) {
+      console.error('No files to upload');
+      return
+    }
     const formData = new FormData();
     uploadedFiles.forEach((file) => {
       formData.append('file', file);
@@ -118,7 +134,7 @@ const App = () => {
                 </tr>
               </thead>
               <tbody>
-                {registrationRes.map((res: any, index) => (
+                {registrationRes.map((res: any, index) => (res && res.row &&
                   <tr key={index} className="text-center">
                     <td className="border border-gray-300 px-4 py-2">{res.row['Registration ID']}</td>
                     <td className="border border-gray-300 px-4 py-2">{res.row['Student ID']}</td>
