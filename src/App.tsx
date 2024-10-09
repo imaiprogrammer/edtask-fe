@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { io } from 'socket.io-client';
 import './index.css'
 
 import FileUploader from './components/FileUploader'
@@ -9,14 +10,38 @@ interface IClassData {
   date: string;
   count: number;
 }
+interface IRegistrationRes {
+  row: {
+    'Registration ID': string;
+    'Student ID': string;
+    'Instructor ID': string;
+    'Class ID': string;
+    'Class Start Time': string;
+    'Action': string;
+  };
+  message: string;
+  status: string;
+}
 
 const App = () => {
 
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [classData, setClassData] = useState<IClassData[]>([]);
-
-  const [registrationRes, setRegistrationRes] = useState([]);
+  const [registrationRes, setRegistrationRes] = useState<IRegistrationRes[]>([]);
   const [loading, setLoading] = useState(false);
+  const socket: any = io(`http://localhost:3000`);
+
+  useEffect(() => {
+    socket.on('record_upload_status', (data: IRegistrationRes) => {
+      setRegistrationRes((prevRegs: any[]) => [...prevRegs, data]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [socket]);
+
+
 
   useEffect(() => {
     const fetchClassDaywiseData = async () => {
@@ -39,6 +64,7 @@ const App = () => {
     const formData = new FormData();
     uploadedFiles.forEach((file) => {
       formData.append('file', file);
+      formData.append('socketId', socket?.id);
     });
     setLoading(true);
     try {
@@ -74,7 +100,7 @@ const App = () => {
           <div>Uploading, please wait...</div>
         </div>
       )}
-      
+
       <div>
         {registrationRes.length > 0 && (
           <div className="mt-8 w-full max-w-4xl">
@@ -88,6 +114,7 @@ const App = () => {
                   <th className="border border-gray-300 px-4 py-2">Start Time</th>
                   <th className="border border-gray-300 px-4 py-2">Action</th>
                   <th className="border border-gray-300 px-4 py-2">Message</th>
+                  <th className="border border-gray-300 px-4 py-2">Upload Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -100,6 +127,7 @@ const App = () => {
                     <td className="border border-gray-300 px-4 py-2">{res.row['Class Start Time']}</td>
                     <td className="border border-gray-300 px-4 py-2">{res.row['Action']}</td>
                     <td className="border border-gray-300 px-4 py-2">{res.message}</td>
+                    <td className="border border-gray-300 px-4 py-2">{res.status}</td>
                   </tr>
                 ))}
               </tbody>
